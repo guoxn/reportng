@@ -76,3 +76,32 @@ div.test                 {margin-top: 0.1em; clear: right; font-size: 1.3em;}
 .overviewTable .number   {width: 5em;}
 .overviewTable tr        {height: 1.6em;}
 
+/* rocketauto customized css */
+/* screenshot img */
+.ssflag {
+    width: 10px;
+    height: 10px;
+    float: right;
+    margin: 3px 4px 0px 0px;
+}
+/* test li */
+.test {
+    background-color: #eeeeee;
+    padding-left: 1em;
+}
+
+.methods {
+    display: none;
+}
+
+/* method li */
+.suiteMethod {
+    background-color: #f9f9f9;
+    list-style-type: none;
+    padding-left: 3em;
+    font-size: 1em;
+}
+
+.classToggle {
+    color: #999999;
+}

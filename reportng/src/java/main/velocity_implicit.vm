@@ -1,0 +1,5 @@
+#* @implicitly included *#
+#* @vtlvariable name="utils" type="org.uncommons.reportng.ReportNGUtils" file="../resources/org/uncommons/reportng/templates/html/suites.html.vm" *#
+#* @vtlvariable name="line" type="" file="../resources/org/uncommons/reportng/templates/html/suites.html.vm" *#
+#* @vtlvariable name="messages" type="java.util.ResourceBundle" file="../resources/org/uncommons/reportng/templates/html/suites.html.vm" *#
+#* @vtlvariable name="suites" type="java.util.Collection<org.testng.ISuite>" file="../resources/org/uncommons/reportng/templates/html/suites.html.vm" *#

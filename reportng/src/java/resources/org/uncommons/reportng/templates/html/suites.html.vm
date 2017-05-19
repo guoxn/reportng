@@ -39,10 +39,12 @@
     #set ($suiteId = $velocityCount)
     #foreach ($result in $suite.results)
         #set ($failuresExist = $result.testContext.failedTests.size()>0 || $result.testContext.failedConfigurations.size()>0)
-
+        #set ($resultFile = "suite${suiteId}_test${velocityCount}_results.html")
+        #set ($toggleId = "toggle-${suiteId}-${velocityCount}")
+        #set ($methodsId = "methods-${suiteId}-${velocityCount}")
         #if (($onlyReportFailures && $failuresExist) || (!$onlyReportFailures))
         <tr>
-      <td class="test">
+      <td class="test" onclick="toggleElement('$methodsId', 'table-row'); toggle('$toggleId')">
         #if ($result.testContext.failedTests.size() > 0)
         <span class="failureIndicator" title="$messages.getString("failed.tooltip")">&#x2718;</span>
         #else
@@ -52,8 +54,78 @@
           <span class="successIndicator" title="$messages.getString("passed.tooltip")">&#x2714;</span>
           #end
         #end
-        <a href="suite${suiteId}_test${velocityCount}_results.html" target="main">$result.testContext.name</a>
+        <span id="$toggleId" class="classToggle">&#x25b6;</span>
+        <a href="$resultFile" target="main">$result.testContext.name</a>
       </td>
+    </tr>
+    <tr id="$methodsId" class="methods">
+    <td>
+    <ul>
+    #foreach ($testResult in $result.testContext.failedTests.allResults)
+      <li class="suiteMethod">
+        <span class="failureIndicator">&#x2718;</span>
+        #set ($hasSS = false)
+        #set ($hasSR = false)
+        #foreach ($line in $utils.getTestOutput($testResult))
+            #if (!$hasSS && $line.contains("<img"))
+                <img src="ss.png" class="ssflag"/>
+                #set ($hasSS = true)
+            #end
+            #if (!$hasSR && $line.contains("<video"))
+                <img src="sr.png" class="ssflag"/>
+                #set ($hasSR = true)
+            #end
+            #if ($hasSS && $hasSR)
+                #break
+            #end
+        #end
+        <a href="$resultFile#$testResult.name" target="main">$testResult.name</a>
+      </li>
+    #end
+    #foreach ($testResult in $result.testContext.skippedTests.allResults)
+    <li class="suiteMethod">
+        <span class="skipIndicator">&#x2714;</span>
+        #set ($hasSS = false)
+        #set ($hasSR = false)
+        #foreach ($line in $utils.getTestOutput($testResult))
+            #if (!$hasSS && $line.contains("<img"))
+                <img src="ss.png" class="ssflag"/>
+                #set ($hasSS = true)
+            #end
+            #if (!$hasSR && $line.contains("<video"))
+                <img src="sr.png" class="ssflag"/>
+                #set ($hasSR = true)
+            #end
+            #if ($hasSS && $hasSR)
+                #break
+            #end
+        #end
+        <a href="$resultFile#$testResult.name" target="main">$testResult.name</a>
+    </li>
+    #end
+    #foreach ($testResult in $result.testContext.passedTests.allResults)
+    <li class="suiteMethod">
+        <span class="successIndicator">&#x2714;</span>
+        #set ($hasSS = false)
+        #set ($hasSR = false)
+        #foreach ($line in $utils.getTestOutput($testResult))
+            #if (!$hasSS && $line.contains("<img"))
+                <img src="ss.png" class="ssflag"/>
+                #set ($hasSS = true)
+            #end
+            #if (!$hasSR && $line.contains("<video"))
+                <img src="sr.png" class="ssflag"/>
+                #set ($hasSR = true)
+            #end
+            #if ($hasSS && $hasSR)
+                #break
+            #end
+        #end
+        <a href="$resultFile#$testResult.name" target="main">$testResult.name</a>
+    </li>
+    #end
+    </ul>
+    </td>
     </tr>
     #end
     #end

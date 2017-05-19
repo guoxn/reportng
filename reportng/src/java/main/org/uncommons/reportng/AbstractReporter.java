@@ -17,6 +17,8 @@ package org.uncommons.reportng;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -27,6 +29,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -39,6 +43,7 @@ import org.testng.IReporter;
 public abstract class AbstractReporter implements IReporter
 {
     private static final String ENCODING = "UTF-8";
+    private List<String> ENCODING_EXTNAMES;
 
     protected static final String TEMPLATE_EXTENSION = ".vm";
 
@@ -76,6 +81,11 @@ public abstract class AbstractReporter implements IReporter
         {
             throw new ReportNGException("Failed to initialise Velocity.", ex);
         }
+        ENCODING_EXTNAMES = new ArrayList<String>();
+        ENCODING_EXTNAMES.add("html");
+        ENCODING_EXTNAMES.add("htm");
+        ENCODING_EXTNAMES.add("css");
+        ENCODING_EXTNAMES.add("js");
     }
 
 
@@ -174,17 +184,41 @@ public abstract class AbstractReporter implements IReporter
         Writer writer = null;
         try
         {
-            reader = new BufferedReader(new InputStreamReader(stream, ENCODING));
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(resourceFile), ENCODING));
-
-            String line = reader.readLine();
-            while (line != null)
-            {
-                writer.write(line);
-                writer.write('\n');
-                line = reader.readLine();
+            String fileName = resourceFile.getName();
+            String extName = fileName.substring(fileName.lastIndexOf(".")+1);
+            if (ENCODING_EXTNAMES.contains(extName)) {
+                reader = new BufferedReader(new InputStreamReader(stream, ENCODING));
+                writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(resourceFile), ENCODING));
+                String line = reader.readLine();
+                while (line != null)
+                {
+                    writer.write(line);
+                    writer.write('\n');
+                    line = reader.readLine();
+                }
+                writer.flush();
+            } else {
+                DataInputStream dis = new DataInputStream(stream);
+                FileOutputStream fos = new FileOutputStream(resourceFile);
+                DataOutputStream dos = new DataOutputStream(fos);
+                int ch;
+                try {
+                    while((ch = dis.read()) != -1) {
+                        dos.write(ch);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        dis.close();
+                        fos.close();
+                        dos.close();
+                    }
+                    catch (IOException e2) {
+                        e2.printStackTrace();
+                    }
+                }
             }
-            writer.flush();
         }
         finally
         {
